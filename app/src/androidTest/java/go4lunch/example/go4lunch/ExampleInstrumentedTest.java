@@ -1,4 +1,4 @@
-package com.example.go4lunch;
+package go4lunch.example.go4lunch;
 
 import android.content.Context;
 
