@@ -33,18 +33,22 @@ public class RestaurantViewModel extends ViewModel {
         repository.getRestaurants(lat, lon, radiusMeters, new Callback<List<Restaurant>>() {
             @Override
             public void onResponse(Call<List<Restaurant>> call, Response<List<Restaurant>> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    restaurantsLiveData.postValue(response.body());
+                if (response.isSuccessful()) {
+                    restaurantsLiveData.setValue(response.body());
                 } else {
-                    errorLiveData.postValue("API error : " + response.code());
+                    errorLiveData.setValue("Error: " + response.code());
                 }
+
             }
 
             @Override
             public void onFailure(Call<List<Restaurant>> call, Throwable t) {
-                errorLiveData.postValue("Network failure : " + t.getMessage());
+                errorLiveData.setValue(t.getMessage());
             }
+
+
         });
+
     }
 }
 

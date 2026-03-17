@@ -3,6 +3,7 @@ package go4lunch.ui.view;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.widget.ImageButton;
@@ -12,6 +13,8 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.lifecycle.ViewModel;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.example.Go4Lunch.R;
 
@@ -25,8 +28,11 @@ import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
+import java.util.List;
+
 import go4lunch.data.api.OpenTripMapApi;
 import go4lunch.data.model.Restaurant;
+import go4lunch.data.remote.RetrofitClient;
 import go4lunch.data.repository.OpenTripMapRepository;
 import go4lunch.ui.viewmodel.RestaurantViewModel;
 
@@ -79,8 +85,49 @@ public class MapsActivity extends AppCompatActivity {
                     LOCATION_PERMISSION_REQUEST);
         }
         OpenTripMapApi api = RetrofitClient.getInstance().create(OpenTripMapApi.class);
-        OpenTripMapRepository repo = new OpenTripMapRepository(api);
+
+        OpenTripMapRepository repo = new OpenTripMapRepository(RetrofitClient.getOpenTripMapApi());
+        viewModel = new ViewModelProvider(this, new ViewModelProvider.NewInstanceFactory() {
+            @NonNull
+            @Override
+            public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
+                return (T) new RestaurantViewModel(repo);
+            }
+        }).get(RestaurantViewModel.class);
+
+        viewModel.getRestaurants().observe(this, restaurants -> {
+            if (restaurants != null) {
+                addMarkers(restaurants);
+            }
+        });
+
+        viewModel.getError().observe(this, error -> Toast.makeText(this, error, Toast.LENGTH_SHORT).show());
+
     }
+
+    private void addMarkers(List<Restaurant> restaurants) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            map.getOverlays().removeIf(overlay -> overlay instanceof Marker);
+        }
+
+        for (Restaurant restaurant : restaurants) {
+            Marker marker = new Marker(map);
+            marker.setPosition(new GeoPoint(restaurant.lat, restaurant.lon));
+            marker.setTitle(restaurant.name != null ? restaurant.name : "No name");
+            marker.setIcon(getResources().getDrawable(R.drawable.outline_cooking_24));
+            marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+            marker.setOnMarkerClickListener((marker1, mapView) -> {
+                Toast.makeText(this, restaurant.name, Toast.LENGTH_SHORT).show();
+                return true;
+            });
+            map.getOverlays().add(marker);
+        }
+        map.invalidate();
+    }
+
+
+
+
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -92,6 +139,7 @@ public class MapsActivity extends AppCompatActivity {
 
     @Override
     protected void onResume() {
+     //   viewModel.loadRestaurants(myLocationOverlay.getMyLocation().getLatitude(), myLocationOverlay.getMyLocation().getLongitude(), 1000);
         super.onResume();
         map.onResume();
         myLocationOverlay.enableMyLocation();

@@ -12,7 +12,7 @@ android {
     defaultConfig {
         buildConfigField("String", "API_KEY", "\"$apiKey\"")
         applicationId = "com.example.go4lunch"
-        minSdk = 21
+        minSdk = 23
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
