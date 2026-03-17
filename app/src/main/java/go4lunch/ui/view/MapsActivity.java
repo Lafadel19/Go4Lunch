@@ -25,14 +25,17 @@ import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
-import go4lunch.data.api.OpenTripMap;
+import go4lunch.data.api.OpenTripMapApi;
 import go4lunch.data.model.Restaurant;
+import go4lunch.data.repository.OpenTripMapRepository;
+import go4lunch.ui.viewmodel.RestaurantViewModel;
 
 public class MapsActivity extends AppCompatActivity {
     private MapView map;
     private MyLocationNewOverlay myLocationOverlay;
     private ImageButton btnMyLocation;
     private IMapController mapController;
+    private RestaurantViewModel viewModel;
 
     private static final int LOCATION_PERMISSION_REQUEST = 1;
 
@@ -75,17 +78,8 @@ public class MapsActivity extends AppCompatActivity {
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                     LOCATION_PERMISSION_REQUEST);
         }
-
-        OpenTripMap.getRestaurants(btnMyLocation, restaurants ->{
-            runOnUiThread(() -> {
-                for (Restaurant restaurant : restaurants) {
-                    addMarker(restaurant);
-                }
-            });
-        } );
-
-
-
+        OpenTripMapApi api = RetrofitClient.getInstance().create(OpenTripMapApi.class);
+        OpenTripMapRepository repo = new OpenTripMapRepository(api);
     }
 
     @Override
@@ -109,15 +103,6 @@ public class MapsActivity extends AppCompatActivity {
         map.onPause();
         myLocationOverlay.disableMyLocation();
     }
-
-    private void addMarker(Restaurant restaurant) {
-        Marker marker = new Marker(map);
-        marker.setPosition(new GeoPoint(restaurant.getLat(), restaurant.getLon()));
-        marker.setTitle(restaurant.getName());
-        map.getOverlays().add(marker);
-        map.invalidate();
-    }
-
 }
 
 
