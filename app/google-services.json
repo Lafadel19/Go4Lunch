@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "656403836202",
+    "project_id": "go4lunch-3984c",
+    "storage_bucket": "go4lunch-3984c.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:656403836202:android:63e86c3693a7c184910253",
+        "android_client_info": {
+          "package_name": "com.example.go4lunch"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDWTgy0TMZdp77lNAmr256Kx_S7mE08AvM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

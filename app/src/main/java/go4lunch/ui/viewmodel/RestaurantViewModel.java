@@ -30,7 +30,7 @@ public class RestaurantViewModel extends ViewModel {
     }
 
     public void loadRestaurants(double lat, double lon, double radiusMeters) {
-        repository.getRestaurants(lat, lon, radiusMeters, new Callback<List<Restaurant>>() {
+     /*   repository.getRestaurants(lat, lon, radiusMeters, new Callback<List<Restaurant>>() {
             @Override
             public void onResponse(Call<List<Restaurant>> call, Response<List<Restaurant>> response) {
                 if (response.isSuccessful()) {
@@ -48,7 +48,7 @@ public class RestaurantViewModel extends ViewModel {
 
 
         });
-
+*/
     }
 }
 
