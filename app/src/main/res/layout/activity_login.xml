@@ -23,7 +23,7 @@
         android:id="@+id/btnGoogleLogin"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="136dp"
         android:backgroundTint="@color/google_red"
         android:text="@string/login_with_google"
         android:textColor="@android:color/white"

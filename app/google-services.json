@@ -12,7 +12,20 @@
           "package_name": "com.example.go4lunch"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "656403836202-og959e5912entkvij9co05jg7mi6p3jq.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.go4lunch",
+            "certificate_hash": "afbf4322a289d9c8905f1d689120bf43777e82cb"
+          }
+        },
+        {
+          "client_id": "656403836202-d28645c4putqe7oadtm055ec52tt6hkq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyDWTgy0TMZdp77lNAmr256Kx_S7mE08AvM"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "656403836202-d28645c4putqe7oadtm055ec52tt6hkq.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }
