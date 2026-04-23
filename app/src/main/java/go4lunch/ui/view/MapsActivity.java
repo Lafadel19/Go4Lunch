@@ -13,10 +13,13 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.ListFragment;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.Go4Lunch.R;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import org.osmdroid.api.IMapController;
 import org.osmdroid.config.Configuration;
@@ -43,8 +46,6 @@ public class MapsActivity extends AppCompatActivity {
     private IMapController mapController;
     private RestaurantViewModel viewModel;
 
-    private static final int LOCATION_PERMISSION_REQUEST = 1;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,22 +54,31 @@ public class MapsActivity extends AppCompatActivity {
         Configuration.getInstance().load(this, PreferenceManager.getDefaultSharedPreferences(this));
 
         setContentView(R.layout.activity_maps);
+        BottomNavigationView nav = findViewById(R.id.bottom_navigation);
 
-        map = findViewById(R.id.map);
-        map.setMultiTouchControls(true);
-        map.setTileSource(TileSourceFactory.MAPNIK);
-        map.setMultiTouchControls(true);
-        map.getZoomController().setVisibility(CustomZoomButtonsController.Visibility.ALWAYS);
-        map.getController().setZoom(15.0);
-        myLocationOverlay = new MyLocationNewOverlay(new GpsMyLocationProvider(this), map);
-        myLocationOverlay.enableMyLocation();
-        map.getOverlays().add(myLocationOverlay);
-        myLocationOverlay.runOnFirstFix(() -> runOnUiThread(() -> {
-            if (myLocationOverlay.getMyLocation() != null) {
-                map.getController().animateTo(myLocationOverlay.getMyLocation());
-                map.getController().setZoom(20.0);
-            }
-        }));
+        if (savedInstanceState == null) {
+            loadFragment(new MapFragment());
+        }
+
+        nav.setOnItemSelectedListener(item -> {
+
+                    if (item.getItemId() == R.id.navigation_map) {
+                        loadFragment(new MapFragment());
+                        return true;
+                    }
+
+                    if (item.getItemId() == R.id.navigation_list) {
+                        loadFragment(new ListFragment());
+                        return true;
+                    }
+
+                    if (item.getItemId() == R.id.navigation_workmates) {
+                        return true;
+                    }
+
+                    return false;
+        });
+
         btnMyLocation = findViewById(R.id.btnMyLocation);
         btnMyLocation.setOnClickListener(v -> {
             GeoPoint myPos = myLocationOverlay.getMyLocation();
@@ -79,79 +89,18 @@ public class MapsActivity extends AppCompatActivity {
                 Toast.makeText(this, "Position currently unavailable...", Toast.LENGTH_SHORT).show();
             }
         });
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                    LOCATION_PERMISSION_REQUEST);
-        }
-        OpenTripMapApi api = RetrofitClient.getInstance().create(OpenTripMapApi.class);
-
-        OpenTripMapRepository repo = new OpenTripMapRepository(RetrofitClient.getOpenTripMapApi());
-        viewModel = new ViewModelProvider(this, new ViewModelProvider.NewInstanceFactory() {
-            @NonNull
-            @Override
-            public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
-                return (T) new RestaurantViewModel(repo);
-            }
-        }).get(RestaurantViewModel.class);
-
-        viewModel.getRestaurants().observe(this, restaurants -> {
-            if (restaurants != null) {
-                addMarkers(restaurants);
-            }
-        });
-
-        viewModel.getError().observe(this, error -> Toast.makeText(this, error, Toast.LENGTH_SHORT).show());
-
     }
 
-    private void addMarkers(List<Restaurant> restaurants) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            map.getOverlays().removeIf(overlay -> overlay instanceof Marker);
-        }
-
-        for (Restaurant restaurant : restaurants) {
-            Marker marker = new Marker(map);
-            marker.setPosition(new GeoPoint(restaurant.lat, restaurant.lon));
-            marker.setTitle(restaurant.name != null ? restaurant.name : "No name");
-            marker.setIcon(getResources().getDrawable(R.drawable.outline_cooking_24));
-            marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
-            marker.setOnMarkerClickListener((marker1, mapView) -> {
-                Toast.makeText(this, restaurant.name, Toast.LENGTH_SHORT).show();
-                return true;
-            });
-            map.getOverlays().add(marker);
-        }
-        map.invalidate();
+    private void loadFragment(Fragment fragment) {
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragment_container, fragment)
+                    .commit();
     }
 
 
-
-
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == LOCATION_PERMISSION_REQUEST && grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            myLocationOverlay.enableMyLocation();
-        }
-    }
-
-    @Override
-    protected void onResume() {
-     //   viewModel.loadRestaurants(myLocationOverlay.getMyLocation().getLatitude(), myLocationOverlay.getMyLocation().getLongitude(), 1000);
-        super.onResume();
-        map.onResume();
-        myLocationOverlay.enableMyLocation();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        map.onPause();
-        myLocationOverlay.disableMyLocation();
-    }
 }
+
 
 
 

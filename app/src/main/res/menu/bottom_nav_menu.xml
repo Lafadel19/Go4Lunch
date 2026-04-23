@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/navigation_map"
+        android:title="Map View"
+        android:icon="@drawable/baseline_map_24"/>
+
+    <item
+        android:id="@+id/navigation_list"
+        android:title="List View"
+        android:icon="@drawable/outline_lists_24"/>
+
+    <item
+        android:id="@+id/navigation_workmates"
+        android:title="Workmates"
+        android:icon="@drawable/outline_groups_24"/>
+
+</menu>
