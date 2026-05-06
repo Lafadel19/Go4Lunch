@@ -1,7 +1,6 @@
 package go4lunch.ui.view;
 
 import android.Manifest;
-import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -13,7 +12,6 @@ import android.widget.ImageButton;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModel;
@@ -49,7 +47,7 @@ public class MapFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
 
-        Configuration.getInstance().load(this, PreferenceManager.getDefaultSharedPreferences(this));
+        Configuration.getInstance().load(requireContext(), PreferenceManager.getDefaultSharedPreferences(requireContext()));
 
         View view = inflater.inflate(R.layout.fragment_map,container,false);
 
@@ -62,13 +60,13 @@ public class MapFragment extends Fragment {
             }
         }).get(RestaurantViewModel.class);
 
-        viewModel.getRestaurants().observe(this, restaurants -> {
+        viewModel.getRestaurants().observe(getViewLifecycleOwner(), restaurants -> {
             if (restaurants != null) {
                 addMarkers(restaurants);
             }
         });
 
-        viewModel.getError().observe(this, error -> Toast.makeText(this, error, Toast.LENGTH_SHORT).show());
+        viewModel.getError().observe(getViewLifecycleOwner(), error -> Toast.makeText(requireContext(), error, Toast.LENGTH_SHORT).show());
 
         map = view.findViewById(R.id.map);
         map.setMultiTouchControls(true);
@@ -76,10 +74,12 @@ public class MapFragment extends Fragment {
         map.setMultiTouchControls(true);
         map.getZoomController().setVisibility(CustomZoomButtonsController.Visibility.ALWAYS);
         map.getController().setZoom(15.0);
-        myLocationOverlay = new MyLocationNewOverlay(new GpsMyLocationProvider(this), map);
+
+
+        myLocationOverlay = new MyLocationNewOverlay(new GpsMyLocationProvider(requireContext()), map);
         myLocationOverlay.enableMyLocation();
         map.getOverlays().add(myLocationOverlay);
-        myLocationOverlay.runOnFirstFix(() -> runOnUiThread(() -> {
+        myLocationOverlay.runOnFirstFix(() -> requireActivity().runOnUiThread(() -> {
             GeoPoint myPos = myLocationOverlay.getMyLocation();
             if (myPos != null) {
                 map.getController().animateTo(myPos);
@@ -88,7 +88,6 @@ public class MapFragment extends Fragment {
             }
         }));
 
-
         btnMyLocation = view.findViewById(R.id.btnMyLocation);
         btnMyLocation.setOnClickListener(v -> {
             GeoPoint myPos = myLocationOverlay.getMyLocation();
@@ -96,14 +95,15 @@ public class MapFragment extends Fragment {
                 map.getController().animateTo(myPos);
                 map.getController().setZoom(20.0);
             } else {
-                Toast.makeText(this, "Position currently unavailable...", Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), "Position currently unavailable...", Toast.LENGTH_SHORT).show();
             }
         });
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this,
+        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                     LOCATION_PERMISSION_REQUEST);
         }
+        return view;
 
     }
 
@@ -119,10 +119,10 @@ public class MapFragment extends Fragment {
             Marker marker = new Marker(map);
             marker.setPosition(new GeoPoint(restaurant.getLatitude(), restaurant.getLongitude()));
             marker.setTitle(restaurant.displayName());
-            marker.setIcon(ContextCompat.getDrawable(this, R.drawable.outline_cooking_24));
+            marker.setIcon(ContextCompat.getDrawable(requireContext(), R.drawable.outline_cooking_24));
             marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
             marker.setOnMarkerClickListener((marker1, mapView) -> {
-                Toast.makeText(this, restaurant.displayName(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), restaurant.displayName(), Toast.LENGTH_SHORT).show();
                 return true;
             });
             map.getOverlays().add(marker);
@@ -134,9 +134,10 @@ public class MapFragment extends Fragment {
 
 
 
+
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    public void ActivityResultLauncher(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.ActivityResultLauncher(requestCode, permissions, grantResults);
         if (requestCode == LOCATION_PERMISSION_REQUEST && grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             myLocationOverlay.enableMyLocation();
             GeoPoint myPos = myLocationOverlay.getMyLocation();
@@ -147,14 +148,14 @@ public class MapFragment extends Fragment {
     }
 
     @Override
-    protected void onResume() {
+    public void onResume() {
         super.onResume();
         map.onResume();
         myLocationOverlay.enableMyLocation();
     }
 
     @Override
-    protected void onPause() {
+    public void onPause() {
         super.onPause();
         map.onPause();
         myLocationOverlay.disableMyLocation();
@@ -162,4 +163,3 @@ public class MapFragment extends Fragment {
 
 
 }
-

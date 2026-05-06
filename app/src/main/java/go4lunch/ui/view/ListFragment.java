@@ -19,20 +19,19 @@ import go4lunch.ui.viewmodel.RestaurantViewModel;
 
 public class ListFragment extends Fragment {
 
-    private RecyclerView recyclerView;
+    public ListFragment() {
+        super(R.layout.fragment_list);
+    }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
+        RecyclerView recycler = view.findViewById(R.id.recycler_view);
+        recycler.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        View view = inflater.inflate(R.layout.fragment_list, container, false);
+        RestaurantViewModel vm = new ViewModelProvider(requireActivity()).get(RestaurantViewModel.class);
 
-        recyclerView = view.findViewById(R.id.recycler_view);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-
-        // TODO: brancher ton adapter avec les données API
-        recyclerView.setAdapter(new MyAdapter(new ArrayList<>()));
-
-        return view;
+        vm.getRestaurants().observe(getViewLifecycleOwner(), data -> {
+            recycler.setAdapter(new RestaurantAdapter(data));
+        });
     }
 }

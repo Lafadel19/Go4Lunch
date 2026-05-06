@@ -40,11 +40,6 @@ import go4lunch.data.repository.OpenTripMapRepository;
 import go4lunch.ui.viewmodel.RestaurantViewModel;
 
 public class MapsActivity extends AppCompatActivity {
-    private MapView map;
-    private MyLocationNewOverlay myLocationOverlay;
-    private ImageButton btnMyLocation;
-    private IMapController mapController;
-    private RestaurantViewModel viewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,18 +74,8 @@ public class MapsActivity extends AppCompatActivity {
                     return false;
         });
 
-        btnMyLocation = findViewById(R.id.btnMyLocation);
-        btnMyLocation.setOnClickListener(v -> {
-            GeoPoint myPos = myLocationOverlay.getMyLocation();
-            if (myPos != null) {
-                map.getController().animateTo(myPos);
-                map.getController().setZoom(20.0);
-            } else {
-                Toast.makeText(this, "Position currently unavailable...", Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
 
+    }
     private void loadFragment(Fragment fragment) {
             getSupportFragmentManager()
                     .beginTransaction()
