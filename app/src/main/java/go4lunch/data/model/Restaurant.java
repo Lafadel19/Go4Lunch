@@ -51,6 +51,10 @@ public class Restaurant {
         return Double.NaN;
     }
 
+    public String getName() {
+        return name;
+    }
+
     public String displayName() {
         return name != null && !name.isEmpty() ? name : "Unknown";
     }

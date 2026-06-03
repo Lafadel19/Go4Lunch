@@ -4,6 +4,8 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import org.osmdroid.util.GeoPoint;
+
 import java.util.List;
 
 import go4lunch.data.model.Restaurant;
@@ -29,26 +31,39 @@ public class RestaurantViewModel extends ViewModel {
         return errorLiveData;
     }
 
+    private GeoPoint lastPosition;
+    private double lastZoom = 18.0;
+
+    public GeoPoint getLastPosition() {
+        return lastPosition;
+    }
+
+    public void setLastPosition(GeoPoint lastPosition) {
+        this.lastPosition = lastPosition;
+    }
+
+    public double getLastZoom() {
+        return lastZoom;
+    }
+
+    public void setLastZoom(double lastZoom) {
+        this.lastZoom = lastZoom;
+    }
+
+
+
     public void loadRestaurants(double lat, double lon, double radiusMeters) {
-     /*   repository.getRestaurants(lat, lon, radiusMeters, new Callback<List<Restaurant>>() {
+        repository.fetchRestaurants(lat, lon, radiusMeters, new OpenTripMapRepository.RestaurantsResultCallback() {
             @Override
-            public void onResponse(Call<List<Restaurant>> call, Response<List<Restaurant>> response) {
-                if (response.isSuccessful()) {
-                    restaurantsLiveData.setValue(response.body());
-                } else {
-                    errorLiveData.setValue("Error: " + response.code());
-                }
-
+            public void onSuccess(List<Restaurant> restaurants) {
+                restaurantsLiveData.postValue(restaurants);
             }
 
             @Override
-            public void onFailure(Call<List<Restaurant>> call, Throwable t) {
-                errorLiveData.setValue(t.getMessage());
+            public void onError(String message) {
+                errorLiveData.postValue(message);
             }
-
-
         });
-*/
     }
 }
 

@@ -18,7 +18,7 @@ import androidx.fragment.app.ListFragment;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.example.Go4Lunch.R;
+import com.lucas.Go4Lunch.R;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import org.osmdroid.api.IMapController;
@@ -63,7 +63,7 @@ public class MapsActivity extends AppCompatActivity {
                     }
 
                     if (item.getItemId() == R.id.navigation_list) {
-                        loadFragment(new ListFragment());
+                        loadFragment(new MyListFragment());
                         return true;
                     }
 

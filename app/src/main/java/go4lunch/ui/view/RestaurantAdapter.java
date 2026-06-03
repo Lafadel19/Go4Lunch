@@ -8,7 +8,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.Go4Lunch.R;
+import com.lucas.Go4Lunch.R;
 
 import java.util.List;
 
@@ -27,7 +27,7 @@ public class RestaurantAdapter extends RecyclerView.Adapter<RestaurantAdapter.Vi
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.fragment_list, parent, false);
+                .inflate(R.layout.restaurant_list, parent, false);
         return new ViewHolder(view);
     }
 
@@ -35,7 +35,7 @@ public class RestaurantAdapter extends RecyclerView.Adapter<RestaurantAdapter.Vi
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Restaurant item = data.get(position);
-        holder.name.setText(item.displayName());
+        holder.name.setText(item.getName());
     }
 
     @Override

@@ -5,14 +5,14 @@ plugins {
 val apiKey: String = project.findProject("API_KEY") as String? ?: ""
 
 android {
-    namespace = "com.example.Go4Lunch"
+    namespace = "com.lucas.Go4Lunch"
     compileSdk {
         version = release(36)
     }
 
     defaultConfig {
         buildConfigField("String", "API_KEY", "\"$apiKey\"")
-        applicationId = "com.example.go4lunch"
+        applicationId = "com.lucas.go4lunch"
         minSdk = 23
         targetSdk = 36
         versionCode = 1
@@ -59,6 +59,7 @@ dependencies {
     // Retrofit
     implementation("com.squareup.retrofit2:retrofit:3.0.0")
     implementation("com.squareup.retrofit2:converter-gson:3.0.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:5.3.0")
     // Firebase
     implementation(platform("com.google.firebase:firebase-bom:34.12.0"))
     implementation("com.google.firebase:firebase-analytics")
