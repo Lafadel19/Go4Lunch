@@ -6,11 +6,12 @@ public class Restaurant {
     public String xid;
     public String name;
     public String kinds;
-    /** Some responses use flat coordinates. */
     public Double lon;
     public Double lat;
     public Point point;
     public Geometry geometry;
+    public String rate;
+    public String image;
 
     public static final class Point {
         public double lon;

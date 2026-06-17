@@ -35,8 +35,8 @@ public class OpenTripMapRepository {
         double lonMin = lon - deltaLon;
         double lonMax = lon + deltaLon;
 
-        // OpenTripMap bbox: lang is only en|ru (fr → 400). kinds use taxonomy codes, e.g. foods (not "restaurants").
-        api.getRestaurants("en", lonMin, latMin, lonMax, latMax, "foods", "json")
+
+        api.getRestaurants("en", lonMin, latMin, lonMax, latMax,rate,image )
                 .enqueue(new Callback<>() {
                     @Override
                     public void onResponse(Call<List<Restaurant>> call, Response<List<Restaurant>> response) {
