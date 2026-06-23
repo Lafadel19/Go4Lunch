@@ -1,33 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
     android:padding="16dp">
+
+
+    <ImageView
+        android:id="@+id/image"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:scaleType="centerCrop"
+        tools:src="@tools:sample/avatars"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
 
     <TextView
         android:id="@+id/txtName"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:textStyle="bold"
-        tools:text="@tools:sample/full_names"/>
+        tools:text="@tools:sample/full_names"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginEnd="8dp"/>
+
 
     <TextView
         android:id="@+id/txtAddress"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        tools:text="@tools:sample/cities"/>
-
-    <RatingBar
-        android:id="@+id/rating"
-        android:progressTint="#e8e337"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:numStars="2"
-        android:isIndicator="true"
-        android:stepSize="1"
-        tools:rating="2"/>
+        tools:text="@tools:sample/cities"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/txtName"
+        android:layout_marginEnd="8dp"/>
 
 
     <TextView
@@ -35,19 +44,41 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textStyle="bold"
-        tools:text="@tools:sample/date/hhmm"/>
+        tools:text="10:30 - 12:00"
+        app:layout_constraintBottom_toBottomOf="@id/image"
+        app:layout_constraintStart_toStartOf="parent"/>
+
 
     <TextView
         android:id="@+id/txtIntention"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        tools:text="2"/>
+        tools:text="2"
+        app:layout_constraintBottom_toTopOf="@id/rating"
+        app:layout_constraintEnd_toStartOf="@id/image"
+        android:layout_marginEnd="8dp"/>
 
-    <ImageView
-        android:id="@+id/image"
+
+    <RatingBar
+        android:id="@+id/rating"
+        style="?android:attr/ratingBarStyleSmall"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        tools:src="@tools:sample/avatars"/>
+        android:isIndicator="true"
+        android:numStars="2"
+        android:stepSize="1"
+        app:layout_constraintBottom_toBottomOf="@id/image"
+        app:layout_constraintEnd_toStartOf="@id/image"
+        android:layout_marginEnd="8dp"/>
 
 
-</LinearLayout>
+    <TextView
+        android:id="@+id/distance"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:text="250m"
+        app:layout_constraintTop_toTopOf="@id/image"
+        app:layout_contraintEnd_toStartOf="@id/image"
+        app:layout_marginEnd="4dp"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
