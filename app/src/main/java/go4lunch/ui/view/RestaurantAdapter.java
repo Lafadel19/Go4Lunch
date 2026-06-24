@@ -3,6 +3,8 @@ package go4lunch.ui.view;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.RatingBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -34,8 +36,16 @@ public class RestaurantAdapter extends RecyclerView.Adapter<RestaurantAdapter.Vi
     // Remplir la vue
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Restaurant item = data.get(position);
-        holder.name.setText(item.getName());
+        Restaurant restaurant = getItem(position);
+
+        holder.txtName.setText(restaurant.getName());
+        holder.txtAddress.setText(restaurant.getAddress());
+        holder.txtSchedule.setText(restaurant.getSchedule());
+        holder.txtIntention.setText(String.valueOf(restaurant.getIntention()));
+        holder.txtDistance.setText(restaurant.getDistance());
+        holder.rating.setRating(restaurant.getRating());
+
+
     }
 
     @Override
@@ -45,11 +55,23 @@ public class RestaurantAdapter extends RecyclerView.Adapter<RestaurantAdapter.Vi
 
     // ViewHolder
     static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView name;
+        TextView txtName;
+        TextView txtAddress;
+        TextView txtSchedule;
+        TextView txtIntention;
+        TextView txtDistance;
+        RatingBar rating;
+        ImageView image;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            name = itemView.findViewById(R.id.item_name);
+            txtName = itemView.findViewById(R.id.txtName);
+            txtAddress = itemView.findViewById(R.id.txtAddress);
+            txtSchedule = itemView.findViewById(R.id.txtSchedule);
+            txtIntention = itemView.findViewById(R.id.txtIntention);
+            txtDistance = itemView.findViewById(R.id.distance);
+            rating = itemView.findViewById(R.id.rating);
+            image = itemView.findViewById(R.id.image);
         }
     }
 }
