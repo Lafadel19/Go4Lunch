@@ -15,13 +15,12 @@ public interface OpenTripMapApi {
             @Query("lon_min") double lonMin,
             @Query("lat_min") double latMin,
             @Query("lon_max") double lonMax,
-            @Query("lat_max") double latMax,
-            @Query("rate") String rate,
-            @Query("image") String image
+            @Query("lat_max") double latMax
     );
     @GET("{lang}/places/xid/{xid}")
     Call<Restaurant> getRestaurants(
             @Path("xid") String xid
+
 
     );
 

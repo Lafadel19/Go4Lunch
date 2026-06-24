@@ -36,7 +36,7 @@ public class OpenTripMapRepository {
         double lonMax = lon + deltaLon;
 
 
-        api.getRestaurants("en", lonMin, latMin, lonMax, latMax,rate,image )
+        api.getRestaurants("en", lonMin, latMin, lonMax, latMax )
                 .enqueue(new Callback<>() {
                     @Override
                     public void onResponse(Call<List<Restaurant>> call, Response<List<Restaurant>> response) {

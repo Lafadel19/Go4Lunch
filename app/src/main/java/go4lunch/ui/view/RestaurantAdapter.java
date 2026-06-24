@@ -29,21 +29,22 @@ public class RestaurantAdapter extends RecyclerView.Adapter<RestaurantAdapter.Vi
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.restaurant_list, parent, false);
+                .inflate(R.layout.item_restaurant, parent, false);
         return new ViewHolder(view);
     }
 
     // Remplir la vue
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Restaurant restaurant = getItem(position);
+        Restaurant restaurant = data.get(position);
 
         holder.txtName.setText(restaurant.getName());
-        holder.txtAddress.setText(restaurant.getAddress());
+        holder.txtAddress.setText(restaurant.address.getAddress());
         holder.txtSchedule.setText(restaurant.getSchedule());
-        holder.txtIntention.setText(String.valueOf(restaurant.getIntention()));
-        holder.txtDistance.setText(restaurant.getDistance());
-        holder.rating.setRating(restaurant.getRating());
+       // holder.txtIntention.setText(String.valueOf(restaurant.getIntention()));
+       // holder.txtDistance.setText(restaurant.getDistance());
+        holder.rating.setRating(Float.parseFloat(restaurant.rate));
+        holder.rating.setNumStars(Integer.parseInt(restaurant.rate));
 
 
     }

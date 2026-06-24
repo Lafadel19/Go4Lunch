@@ -56,6 +56,10 @@ public class RestaurantViewModel extends ViewModel {
         repository.fetchRestaurants(lat, lon, radiusMeters, new OpenTripMapRepository.RestaurantsResultCallback() {
             @Override
             public void onSuccess(List<Restaurant> restaurants) {
+                for (Restaurant restaurant : restaurants) {
+
+
+                }
                 restaurantsLiveData.postValue(restaurants);
             }
 

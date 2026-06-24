@@ -12,6 +12,7 @@ public class Restaurant {
     public Geometry geometry;
     public String rate;
     public String image;
+    public Address address;
 
     public static final class Point {
         public double lon;
@@ -59,4 +60,8 @@ public class Restaurant {
     public String displayName() {
         return name != null && !name.isEmpty() ? name : "Unknown";
     }
+
+    public String getSchedule() { return "11h30-22h30";}
+
+
 }
