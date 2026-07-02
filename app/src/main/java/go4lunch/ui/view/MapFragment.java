@@ -17,16 +17,14 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.lucas.Go4Lunch.BuildConfig;
 import com.lucas.Go4Lunch.R;
-import org.osmdroid.api.IMapController;
+
 import org.osmdroid.config.Configuration;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.CustomZoomButtonsController;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
-import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
 import java.util.List;
@@ -48,21 +46,12 @@ public class MapFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
         View view = inflater.inflate(R.layout.fragment_map, container, false);
 
-
-        Configuration.getInstance().load(
-                requireContext(),
-                PreferenceManager.getDefaultSharedPreferences(requireContext())
-        );
-        Configuration.getInstance().setUserAgentValue(
-                requireContext().getPackageName()
-        );
-
+        Configuration.getInstance().load(requireContext(), PreferenceManager.getDefaultSharedPreferences(requireContext()));
+        Configuration.getInstance().setUserAgentValue(requireContext().getPackageName());
 
         OpenTripMapRepository repo = new OpenTripMapRepository(RetrofitClient.getOpenTripMapApi());
-
         viewModel = new ViewModelProvider(requireActivity(), new ViewModelProvider.NewInstanceFactory() {
             @NonNull
             @Override
@@ -71,74 +60,61 @@ public class MapFragment extends Fragment {
             }
         }).get(RestaurantViewModel.class);
 
-        viewModel.getRestaurants().observe(getViewLifecycleOwner(), restaurants -> {
-            if (restaurants != null) {
-                addMarkers(restaurants);
-            }
-        });
+        setupObservers();
+        setupMapView(view);
 
+        btnMyLocation = view.findViewById(R.id.btnMyLocation);
+        btnMyLocation.setOnClickListener(v -> centerOnMyLocation());
+
+        checkPermissionsAndStartLocation();
+
+        return view;
+    }
+
+    private void setupObservers() {
+        viewModel.getRestaurants().observe(getViewLifecycleOwner(), restaurants -> {
+            if (restaurants != null) addMarkers(restaurants);
+        });
         viewModel.getError().observe(getViewLifecycleOwner(),
                 error -> Toast.makeText(requireContext(), error, Toast.LENGTH_SHORT).show()
         );
+    }
 
-
+    private void setupMapView(View view) {
         map = view.findViewById(R.id.map);
         map.setUseDataConnection(true);
         map.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
         map.setTileSource(TileSourceFactory.MAPNIK);
         map.setMultiTouchControls(true);
         map.getZoomController().setVisibility(CustomZoomButtonsController.Visibility.ALWAYS);
-        map.getController().setZoom(15.0);
 
-        btnMyLocation = view.findViewById(R.id.btnMyLocation);
-
-        GeoPoint savedPosition = viewModel.getLastPosition();
-
-        if (savedPosition != null) {
-
-
-            map.getController().setCenter(savedPosition);
-
-            map.getController().setZoom(
-                    viewModel.getLastZoom()
-            );
-            initLocationOverlay();
-
+        GeoPoint savedPos = viewModel.getLastPosition();
+        if (savedPos != null) {
+            map.getController().setCenter(savedPos);
+            map.getController().setZoom(viewModel.getLastZoom());
         } else {
+            map.getController().setZoom(15.0);
+        }
+    }
 
-            if (ContextCompat.checkSelfPermission(
-                    requireContext(),
-                    Manifest.permission.ACCESS_FINE_LOCATION)
-                    == PackageManager.PERMISSION_GRANTED) {
-
-                initLocationOverlay();
-
+    private void centerOnMyLocation() {
+        if (myLocationOverlay != null) {
+            GeoPoint myPos = myLocationOverlay.getMyLocation();
+            if (myPos != null) {
+                map.getController().animateTo(myPos);
+                map.getController().setZoom(20.0);
             } else {
-
-                requestPermissions(
-                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                        LOCATION_PERMISSION_REQUEST
-                );
+                Toast.makeText(requireContext(), "Position indisponible...", Toast.LENGTH_SHORT).show();
             }
         }
+    }
 
-
-
-
-
-        btnMyLocation.setOnClickListener(v -> {
-            if (myLocationOverlay != null) {
-                GeoPoint myPos = myLocationOverlay.getMyLocation();
-                if (myPos != null) {
-                    map.getController().animateTo(myPos);
-                    map.getController().setZoom(20.0);
-                } else {
-                    Toast.makeText(requireContext(), "Position indisponible...", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-
-        return view;
+    private void checkPermissionsAndStartLocation() {
+        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            initLocationOverlay();
+        } else {
+            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST);
+        }
     }
 
     private void initLocationOverlay() {
@@ -151,13 +127,12 @@ public class MapFragment extends Fragment {
             if (myPos != null) {
                 map.getController().animateTo(myPos);
                 map.getController().setZoom(18.0);
-                map.setPadding(0,0,0,60);
+                map.setPadding(0, 0, 0, 60);
                 if (viewModel != null) {
-                    viewModel.loadRestaurants(
-                            myPos.getLatitude(),
-                            myPos.getLongitude(),
-                            1000
-                    );
+                    viewModel.setCurrentUserLocation(myPos);
+                    if (viewModel.getRestaurants().getValue() == null || viewModel.getRestaurants().getValue().isEmpty()) {
+                        viewModel.loadRestaurants(myPos.getLatitude(), myPos.getLongitude(), 1000);
+                    }
                 }
             }
         }));
@@ -172,50 +147,27 @@ public class MapFragment extends Fragment {
             if (!restaurant.hasCoordinates()) continue;
 
             Marker marker = new Marker(map);
-            marker.setPosition(new GeoPoint(
-                    restaurant.getLatitude(),
-                    restaurant.getLongitude()
-            ));
+            marker.setPosition(new GeoPoint(restaurant.getLatitude(), restaurant.getLongitude()));
             marker.setTitle(restaurant.displayName());
-            marker.setIcon(ContextCompat.getDrawable(
-                    requireContext(),
-                    R.drawable.outline_cooking_24
-            ));
+            marker.setIcon(ContextCompat.getDrawable(requireContext(), R.drawable.outline_cooking_24));
             marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
-
             marker.setOnMarkerClickListener((m, mapView) -> {
-                Toast.makeText(requireContext(),
-                        restaurant.displayName(),
-                        Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), restaurant.displayName(), Toast.LENGTH_SHORT).show();
                 return true;
             });
-
             map.getOverlays().add(marker);
         }
-
         map.invalidate();
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           @NonNull String[] permissions,
-                                           @NonNull int[] grantResults) {
-
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-
-        if (requestCode == LOCATION_PERMISSION_REQUEST) {
-            if (grantResults.length > 0 &&
-                    grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
-                initLocationOverlay();
-
-            } else {
-                Toast.makeText(requireContext(),
-                        "Permission localisation refusée",
-                        Toast.LENGTH_SHORT).show();
-            }
+        if (requestCode == LOCATION_PERMISSION_REQUEST && grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            initLocationOverlay();
         }
     }
+
     @Override
     public void onResume() {
         super.onResume();
@@ -227,12 +179,8 @@ public class MapFragment extends Fragment {
     public void onPause() {
         super.onPause();
         if (map != null) {
-            viewModel.setLastPosition(
-                    (GeoPoint) map.getMapCenter()
-            );
-            viewModel.setLastZoom(
-                    map.getZoomLevelDouble()
-            );
+            viewModel.setLastPosition((GeoPoint) map.getMapCenter());
+            viewModel.setLastZoom(map.getZoomLevelDouble());
             map.onPause();
         }
         if (myLocationOverlay != null) myLocationOverlay.disableMyLocation();

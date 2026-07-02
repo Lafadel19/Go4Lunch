@@ -9,19 +9,19 @@ import retrofit2.http.Path;
 import retrofit2.http.Query;
 
 public interface OpenTripMapApi {
-    @GET("{lang}/places/bbox?kinds=foods&format=json&limit=10")
+    @GET("{lang}/places/bbox?kinds=foods&format=json")
     Call<List<Restaurant>> getRestaurants(
             @Path("lang") String lang,
             @Query("lon_min") double lonMin,
             @Query("lat_min") double latMin,
             @Query("lon_max") double lonMax,
-            @Query("lat_max") double latMax
+            @Query("lat_max") double latMax,
+            @Query("limit") int limit
     );
     @GET("{lang}/places/xid/{xid}")
-    Call<Restaurant> getRestaurants(
+    Call<Restaurant> getRestaurantDetails(
+            @Path("lang") String lang,
             @Path("xid") String xid
-
-
     );
 
 

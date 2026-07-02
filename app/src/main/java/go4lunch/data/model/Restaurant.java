@@ -13,6 +13,7 @@ public class Restaurant {
     public String rate;
     public String image;
     public Address address;
+    public String distance;
 
     public static final class Point {
         public double lon;
@@ -62,6 +63,19 @@ public class Restaurant {
     }
 
     public String getSchedule() { return "11h30-22h30";}
+
+    public String getRate() {
+        try {
+            if (Integer.parseInt(rate) >3) {
+            return "3";
+        }
+        else return rate;
+
+        } catch (NumberFormatException e) {
+            return "0" ;
+        }
+
+    }
 
 
 }

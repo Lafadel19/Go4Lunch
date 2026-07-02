@@ -38,15 +38,22 @@ public class RestaurantAdapter extends RecyclerView.Adapter<RestaurantAdapter.Vi
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Restaurant restaurant = data.get(position);
 
-        holder.txtName.setText(restaurant.getName());
-        holder.txtAddress.setText(restaurant.address.getAddress());
+        holder.txtName.setText(restaurant.displayName());
+        if (restaurant.address != null) {
+            holder.txtAddress.setText(restaurant.address.getAddress());
+        } else {
+            holder.txtAddress.setText("Unknown Address");
+        }
         holder.txtSchedule.setText(restaurant.getSchedule());
-       // holder.txtIntention.setText(String.valueOf(restaurant.getIntention()));
-       // holder.txtDistance.setText(restaurant.getDistance());
-        holder.rating.setRating(Float.parseFloat(restaurant.rate));
-        holder.rating.setNumStars(Integer.parseInt(restaurant.rate));
+        holder.txtDistance.setText(restaurant.distance);
+        holder.txtIntention.setText("0"); // Placeholder
 
-
+        String rate = restaurant.getRate();
+        try {
+            holder.rating.setRating(Float.parseFloat(rate));
+        } catch (NumberFormatException e) {
+            holder.rating.setRating(0);
+        }
     }
 
     @Override

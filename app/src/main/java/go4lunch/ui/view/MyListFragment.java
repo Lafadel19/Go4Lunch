@@ -35,7 +35,7 @@ public class MyListFragment extends Fragment {
         recycler.setLayoutManager(new LinearLayoutManager(getContext()));
         OpenTripMapRepository repo = new OpenTripMapRepository(RetrofitClient.getOpenTripMapApi());
 
-        RestaurantViewModel vm = new ViewModelProvider(this, new ViewModelProvider.NewInstanceFactory() {
+        RestaurantViewModel vm = new ViewModelProvider(requireActivity(), new ViewModelProvider.NewInstanceFactory() {
             @NonNull
             @Override
             public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
@@ -46,11 +46,14 @@ public class MyListFragment extends Fragment {
         vm.getRestaurants().observe(getViewLifecycleOwner(), data -> {
             recycler.setAdapter(new RestaurantAdapter(data));
         });
-        vm.loadRestaurants(
-                 48.85852716675161 , 2.346457830056134,
-                1000
-        );
-        return view ;
+
+        if (vm.getRestaurants().getValue() == null || vm.getRestaurants().getValue().isEmpty()) {
+            vm.loadRestaurants(
+                    48.85852716675161, 2.346457830056134,
+                    1000
+            );
+        }
+        return view;
     }
 
 }
